@@ -37,6 +37,7 @@ class BaseBO(BaseOptimizer):
         model: Optional[Any] = None,
         eval_type: str = "list",
         DoE_size: Optional[int] = None,
+        initial_points: Optional[List] = None,
         warm_data: Tuple = None,
         n_point: int = 1,
         acquisition_fun: str = "EI",
@@ -70,6 +71,8 @@ class BaseBO(BaseOptimizer):
             it could be either 'list' or 'dict', by default 'list'.
         DoE_size : int, optional
             The size of inital Design of Experiment (DoE), by default None.
+        initial_points : List, optional
+            The initial sample points.
         warm_data: Tuple, optional
             The warm-starting data in a pair of design points and its objective values
             `(X, y)`, where `X` should be a list of points and has the same length with `y`.
@@ -107,6 +110,7 @@ class BaseBO(BaseOptimizer):
         self.data_file = data_file
         self.metric_meta = None
         self.DoE_size = DoE_size
+        self.initial_points = initial_points
 
         self.acquisition_fun = acquisition_fun
         self._acquisition_par = acquisition_par if acquisition_par else {}
@@ -360,6 +364,11 @@ class BaseBO(BaseOptimizer):
             self.hist_f.append(xopt.fitness)
 
     def create_DoE(self, n_point: int, fixed: Dict = None) -> List:
+        return self.default_create_DoE(n_point=n_point, fixed=fixed) \
+            if self.initial_points is None \
+            else self.initial_points
+
+    def default_create_DoE(self, n_point: int, fixed: Dict = None) -> List:
         """get the initial sample points using Design of Experiemnt (DoE) methods
 
         Parameters
