@@ -364,9 +364,12 @@ class BaseBO(BaseOptimizer):
             self.hist_f.append(xopt.fitness)
 
     def create_DoE(self, n_point: int, fixed: Dict = None) -> List:
-        return self.default_create_DoE(n_point=n_point, fixed=fixed) \
-            if self.initial_points is None \
-            else self.initial_points
+        if self.initial_points is None:
+            return self.default_create_DoE(n_point=n_point, fixed=fixed)
+        else:
+            initial_points = self.initial_points
+            self.initial_points = None
+            return initial_points
 
     def default_create_DoE(self, n_point: int, fixed: Dict = None) -> List:
         """get the initial sample points using Design of Experiemnt (DoE) methods
