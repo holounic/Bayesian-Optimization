@@ -294,7 +294,8 @@ class BaseBO(BaseOptimizer):
         else:  # take the initial DoE
             n_point = self._DoE_size if n_point is None else n_point
             msg = f"asking {n_point} points (using DoE):"
-            X = self.create_DoE(n_point, fixed=fixed)
+            X = self.initial_points if self.initial_points is not None else np.array(self.create_DoE(n_point, fixed=fixed))
+            self.initial_points = X
 
         if len(X) == 0:
             raise AskEmptyError()
@@ -364,14 +365,6 @@ class BaseBO(BaseOptimizer):
             self.hist_f.append(xopt.fitness)
 
     def create_DoE(self, n_point: int, fixed: Dict = None) -> List:
-        if self.initial_points is None:
-            return self.default_create_DoE(n_point=n_point, fixed=fixed)
-        else:
-            initial_points = self.initial_points
-            self.initial_points = None
-            return initial_points
-
-    def default_create_DoE(self, n_point: int, fixed: Dict = None) -> List:
         """get the initial sample points using Design of Experiemnt (DoE) methods
 
         Parameters
