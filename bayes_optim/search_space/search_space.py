@@ -10,7 +10,6 @@ from itertools import chain
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
-from numpy.random import rand
 from py_expression_eval import Parser
 from pyDOE import lhs
 from sobol_seq import i4_sobol_generate
@@ -95,7 +94,6 @@ class SearchSpace:
         self._levels: dict = {}
 
         self.random_seed: int = random_seed
-        np.random.seed(self.random_seed)
 
         self._set_data(data)
         self._set_structure(structure)
@@ -130,10 +128,8 @@ class SearchSpace:
 
     @random_seed.setter
     def random_seed(self, seed):
-        if seed:
-            seed = int(seed)
         self._random_seed = seed
-        np.random.seed(self._random_seed)
+        self.random_state = np.random.RandomState(self._random_seed)
 
     @staticmethod
     def _ready_args(bounds, var_name, **kwargs):
@@ -552,7 +548,7 @@ class SearchSpace:
         # get unique rows
         # S = np.array([list(x) for x in set(tuple(x) for x in S)], dtype=object)
         if len(S) > N:
-            S = S[np.random.choice(len(S), N, replace=False)]
+            S = S[self.random_state.choice(len(S), N, replace=False)]
         return S
 
     def _sample(self, N: int = 1, method: str = "uniform") -> np.ndarray:
@@ -745,12 +741,12 @@ class RealSpace(SearchSpace):
         bounds = np.array([var._bounds_transformed for var in self.data])
         lb, ub = bounds[:, 0], bounds[:, 1]
         if method == "uniform":  # uniform random samples
-            X = (ub - lb) * rand(N, self.dim) + lb
+            X = (ub - lb) * self.random_state.rand(N, self.dim) + lb
         elif method == "LHS":  # Latin hypercube sampling
             if N == 1:
-                X = (ub - lb) * rand(N, self.dim) + lb
+                X = (ub - lb) * self.random_state.rand(N, self.dim) + lb
             else:
-                X = (ub - lb) * lhs(self.dim, samples=N, criterion="maximin") + lb
+                X = (ub - lb) * lhs(self.dim, samples=N, criterion="maximin", random_state=self.random_state) + lb
         elif method == "sobol":
             X = (ub - lb) * i4_sobol_generate(self.dim, N) + lb
         return self.round(self.to_linear_scale(X))
