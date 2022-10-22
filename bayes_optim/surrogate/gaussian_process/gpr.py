@@ -2,7 +2,6 @@ import warnings
 
 import numpy as np
 from numpy import array, dot, exp, log, log10, pi, sqrt
-from numpy.random import uniform
 from scipy import linalg
 from scipy.linalg import LinAlgError, cho_solve, cholesky, solve_triangular
 from scipy.optimize import fmin_l_bfgs_b
@@ -1092,13 +1091,13 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
             log10theta0 = (
                 log10(self.theta0)
                 if self.theta0 is not None
-                else np.random.uniform(log10(self.thetaL), log10(self.thetaU))
+                else self.random_state.uniform(log10(self.thetaL), log10(self.thetaU))
             )
 
         if self.estimation_mode == "noiseless" and self.likelihood == "concentrated":
             log10param = log10theta0
         else:
-            log10param = np.r_[log10theta0, uniform(log10bounds[n_theta:, 0], log10bounds[n_theta:, 1])]
+            log10param = np.r_[log10theta0, self.random_state.uniform(log10bounds[n_theta:, 0], log10bounds[n_theta:, 1])]
 
         n_par = len(log10param)
         eval_budget = 200 * n_par if self.eval_budget is None else self.eval_budget
@@ -1124,7 +1123,7 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
 
             for iteration in range(self.random_start):
                 if iteration != 0:
-                    log10param = np.random.uniform(log10bounds[:, 0], log10bounds[:, 1])
+                    log10param = self.random_state.uniform(log10bounds[:, 0], log10bounds[:, 1])
 
                 # TODO: may be expose the parameter of fmin_l_bfgs_b to the user
                 param_opt_, llf_opt_, info = fmin_l_bfgs_b(

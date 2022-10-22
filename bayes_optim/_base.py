@@ -34,7 +34,6 @@ class BaseOptimizer:
         self.instance_id: str = instance_id if instance_id else str(id(self))
 
         self.random_seed: int = random_seed
-        np.random.seed(random_seed)
 
         self.obj_fun: callable = obj_fun
         self.parallel_obj_fun: callable = parallel_obj_fun
@@ -151,10 +150,8 @@ class BaseOptimizer:
 
     @random_seed.setter
     def random_seed(self, seed):
-        if seed:
-            self._random_seed = int(seed)
-            if self._random_seed:
-                np.random.seed(self._random_seed)
+        self._random_seed = seed
+        self.random_state = np.random.RandomState(self._random_seed)
 
     @property
     def search_space(self):
