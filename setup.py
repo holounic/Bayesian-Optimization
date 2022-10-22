@@ -24,7 +24,7 @@ setup(
         "dill>=0.3.3",
         "joblib>=1.0.0",
         "numpy>=1.19.2",
-        "pyDOE>=0.3.8",
+        "pyDOE @ git+https://github.com/holounic/pyDOE",
         "scikit-learn>=0.23.2",
         "scipy>=1.5.4",
         "sklearn==0.0",
