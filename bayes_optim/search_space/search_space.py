@@ -95,6 +95,8 @@ class SearchSpace:
         self._levels: dict = {}
 
         self.random_seed: int = random_seed
+        np.random.seed(self.random_seed)
+
         self._set_data(data)
         self._set_structure(structure)
         SearchSpace.__set_type(self)
