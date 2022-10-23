@@ -338,11 +338,10 @@ class SearchSpace:
     def __sub__(self, space) -> SearchSpace:
         """Substraction of two `SearchSpace` instances"""
         assert isinstance(space, SearchSpace)
-        random_seed = self.random_seed if self.random_seed else space.random_seed
         _res = set(self.var_name) - set(space.var_name)
         _index = [self.var_name.index(_) for _ in _res]
         data = [copy(self.data[i]) for i in range(self.dim) if i in _index]
-        cs = SearchSpace(data, random_seed)
+        cs = SearchSpace(data, self.random_state)
         # backwards compatibility
         if hasattr(self, "structure"):
             getattr(cs, "_set_structure")(self.structure)
