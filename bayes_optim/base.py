@@ -111,6 +111,7 @@ class BaseBO(BaseOptimizer):
         self.metric_meta = None
         self.DoE_size = DoE_size
         self.initial_points = initial_points
+        self._history = []
 
         self.acquisition_fun = acquisition_fun
         self._acquisition_par = acquisition_par if acquisition_par else {}
@@ -123,6 +124,10 @@ class BaseBO(BaseOptimizer):
         self._init_flatfitness_trial = 2
         self._set_aux_vars()
         self.warm_data = warm_data
+
+    @property
+    def history(self):
+        return self._history
 
     @property
     def acquisition_fun(self):
@@ -256,6 +261,7 @@ class BaseBO(BaseOptimizer):
     def step(self):
         self.logger.info(f"iteration {self.iter_count} starts...")
         X = self.ask()
+        self._history.append(X)
         func_vals = self.evaluate(X)
         self.tell(X, func_vals)
 
