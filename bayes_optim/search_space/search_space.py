@@ -75,7 +75,7 @@ class SearchSpace:
     def __init__(
         self,
         data: List[Variable],
-        random_seed: int = None,
+        random_state: Union[int, np.RandomState] = None,
         structure: Union[dict, List[Node]] = None,
     ):
         """Search Space
@@ -84,16 +84,17 @@ class SearchSpace:
         ----------
         data : List[Variable]
             a list of variables consistuting the search space
-        random_seed : int, optional
-            random seed controlling the `sample` function, by default None
+        random_state : int or numpy.RandomState, optional
+            random state controlling all random operations inside the instance, by default None
         """
         # declarations to fix the pylint warnings..
         self._var_name: List[str] = []
         self._var_type: List[str] = []
         self._bounds: List[tuple] = []
         self._levels: dict = {}
+        self._random_state: np.RandomState = None
 
-        self.random_seed: int = random_seed
+        self.random_state = random_state
 
         self._set_data(data)
         self._set_structure(structure)
@@ -123,13 +124,12 @@ class SearchSpace:
         return self._bounds
 
     @property
-    def random_seed(self):
-        return self._random_seed
+    def random_state(self):
+        return self._random_state
 
-    @random_seed.setter
-    def random_seed(self, seed):
-        self._random_seed = seed
-        self.random_state = np.random.RandomState(self._random_seed)
+    @random_state.setter
+    def random_state(self, seed):
+        self._random_state = np.random.RandomState(seed) if isinstance(seed, int) else seed
 
     @staticmethod
     def _ready_args(bounds, var_name, **kwargs):
@@ -258,7 +258,7 @@ class SearchSpace:
         if isinstance(data, Variable):
             out = data
         elif isinstance(data, list):
-            out = SearchSpace(data, self.random_seed)
+            out = SearchSpace(data, self.random_state)
             # backwards compatibility
             if hasattr(self, "structure"):
                 getattr(out, "_set_structure")(self.structure)
@@ -375,7 +375,7 @@ class SearchSpace:
         data = [deepcopy(var) for _ in range(max(1, int(N))) for var in self.data]
         # TODO: this is not working yet..
         # structure = [t.deepcopy() for _ in range(max(1, int(N))) for t in self.structure]
-        obj = SearchSpace(data, self.random_seed)
+        obj = SearchSpace(data, self.random_state)
         obj.__class__ = type(self)
         return obj
 
