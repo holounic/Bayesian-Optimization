@@ -128,8 +128,8 @@ class SearchSpace:
         return self._random_state
 
     @random_state.setter
-    def random_state(self, seed):
-        self._random_state = np.random.RandomState(seed) if isinstance(seed, int) else seed
+    def random_state(self, state):
+        self._random_state = np.random.RandomState(state) if isinstance(state, int) or state is None else state
 
     @staticmethod
     def _ready_args(bounds, var_name, **kwargs):
