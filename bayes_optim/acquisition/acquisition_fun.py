@@ -105,7 +105,7 @@ class ImprovementBased(AcquisitionFunction):
 
 
 class UCB(AcquisitionFunction):
-    def __init__(self, alpha: float = 0.1, **kwargs):
+    def __init__(self, alpha: float = 0.5, **kwargs):
         """Upper Confidence Bound
 
         \alpha(x) = m(x) + \alpha * \sigma(x),
