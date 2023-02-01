@@ -202,7 +202,7 @@ class EpsilonPI(ImprovementBased):
 
     @epsilon.setter
     def epsilon(self, eps):
-        assert eps > 0
+        assert eps >= 0
         self._epsilon = eps
 
     def __call__(self, X, return_dx=False):
