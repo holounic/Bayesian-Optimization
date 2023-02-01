@@ -451,7 +451,10 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
             with the Mean Squared Error at x.
         """
         assert hasattr(self, "X")
-        X = check_array(X)
+        try:
+            X = check_array(X)
+        except:
+            print('Trouble X', X)
         n_eval, _ = X.shape
         n_samples, n_features = self.X.shape
         n_targets = self.y.shape[1]
